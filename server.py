@@ -1,13 +1,36 @@
-#!/usr/bin/python           # This is client.py file
+import socket
+import sys
 
-import socket               # Import socket module
+# Create a TCP/IP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-s = socket.socket()         # Create a socket object
-#host = socket.gethostname() # Get local machine name
-port = 59000                # Reserve a port for your service.
+# Bind the socket to the port
+server_address = ('localhost', 10000)
+print ('starting up on %s port %s' % server_address,file=sys.stderr)
+sock.bind(server_address)
 
-s.connect(("Bernardo", port))
+# Listen for incoming connections
+sock.listen(1)
 
-s.send("Puta és tu?")
-print (s.recv(1024))
-s.close                     # Close the socket when done
+while True:
+    # Wait for a connection
+    print ('waiting for a connection', file=sys.stderr) 
+    connection, client_address = sock.accept()
+    
+    try:
+        print  ('connection from ' ,client_address, file=sys.stderr)
+
+        # Receive the data in small chunks and retransmit it
+        while True:
+            data = connection.recv(16).decode()
+            print ('received "%s"' % data, file=sys.stderr) 
+            if data:
+                print ('sending data back to the client',file=sys.stderr) 
+                connection.sendall(data.encode())
+            else:
+                print ('no more data from',client_address)
+                break
+            
+    finally:
+        # Clean up the connection
+        connection.close()
