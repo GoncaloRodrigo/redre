@@ -1,6 +1,8 @@
 import socket
 import sys
 
+var = input("Please enter something: ")
+print ("you entered", var)
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
